@@ -1,20 +1,47 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import './App.css'
 
 const metrics = [
-  { value: '98%', label: 'Scroll smoothness score' },
-  { value: '4.6s', label: 'Average session depth' },
-  { value: '120k', label: 'Monthly interactions' },
+  { value: '58%', label: 'Increase in pick up point use' },
+  { value: '23%', label: 'Decreased in customer phone calls' },
+  { value: '27%', label: 'Increase in pick up point use' },
+  { value: '40%', label: 'Decreased in customer phone calls' },
 ]
 
 const headlineText = 'WELCOME ITZFIZZ'
+
+const buildHeadlineSequence = (text) => {
+  const words = text.split(' ')
+  return words.flatMap((word, wordIndex) => {
+    const letters = word
+      .split('')
+      .map((char, charIndex) => ({
+        char,
+        key: `${wordIndex}-${charIndex}`,
+        spacer: false,
+      }))
+
+    if (wordIndex < words.length - 1) {
+      letters.push({
+        char: '',
+        key: `space-${wordIndex}`,
+        spacer: true,
+      })
+    }
+
+    return letters
+  })
+}
 
 function App() {
   const heroRef = useRef(null)
   const visualRef = useRef(null)
   const glowRef = useRef(null)
-  const rafRef = useRef(0)
+  const orbOneRef = useRef(null)
+  const orbTwoRef = useRef(null)
+  const orbThreeRef = useRef(null)
   const prefersReducedMotion = useMemo(
     () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     []
@@ -50,92 +77,110 @@ function App() {
 
   useEffect(() => {
     const visual = visualRef.current
+    const glow = glowRef.current
     if (!visual) return
     if (prefersReducedMotion) return
 
-    const setVisual = gsap.quickSetter(visual, 'transform')
-    const setGlow = glowRef.current
-      ? gsap.quickSetter(glowRef.current, 'opacity')
-      : null
+    gsap.registerPlugin(ScrollTrigger)
 
-    const state = {
-      x: 0,
-      y: 0,
-      rotate: -2,
-      scale: 1,
-      glow: 0,
-    }
+    const ctx = gsap.context(() => {
+      gsap.set(visual, { x: -120, y: 40, rotate: -8, scale: 0.96 })
+      if (glow) gsap.set(glow, { opacity: 0.2 })
+      if (orbOneRef.current) gsap.set(orbOneRef.current, { y: 0 })
+      if (orbTwoRef.current) gsap.set(orbTwoRef.current, { y: 0 })
+      if (orbThreeRef.current) gsap.set(orbThreeRef.current, { y: 0 })
 
-    const target = { ...state }
+      gsap.to(visual, {
+        x: 360,
+        y: -150,
+        rotate: 22,
+        scale: 1.16,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: heroRef.current,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 1.4,
+        },
+      })
 
-    const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+      if (glow) {
+        gsap.to(glow, {
+          opacity: 0.9,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 1.4,
+          },
+        })
+      }
 
-    const updateTargets = () => {
-      const viewport = window.innerHeight
-      const scrollY = window.scrollY
-      const progress = clamp(scrollY / (viewport * 1.4), 0, 1)
+      if (orbOneRef.current) {
+        gsap.to(orbOneRef.current, {
+          y: 120,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 1.6,
+          },
+        })
+      }
 
-      target.x = -60 + progress * 240
-      target.y = 20 + progress * -90
-      target.rotate = -6 + progress * 18
-      target.scale = 1 + progress * 0.08
-      target.glow = 0.2 + progress * 0.65
-    }
+      if (orbTwoRef.current) {
+        gsap.to(orbTwoRef.current, {
+          y: -140,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 1.6,
+          },
+        })
+      }
 
-    const tick = () => {
-      state.x += (target.x - state.x) * 0.08
-      state.y += (target.y - state.y) * 0.08
-      state.rotate += (target.rotate - state.rotate) * 0.08
-      state.scale += (target.scale - state.scale) * 0.08
-      state.glow += (target.glow - state.glow) * 0.08
+      if (orbThreeRef.current) {
+        gsap.to(orbThreeRef.current, {
+          y: 90,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 1.6,
+          },
+        })
+      }
+    }, heroRef)
 
-      setVisual(
-        `translate3d(${state.x}px, ${state.y}px, 0) rotate(${state.rotate}deg) scale(${state.scale})`
-      )
-      if (setGlow) setGlow(state.glow)
-
-      rafRef.current = requestAnimationFrame(tick)
-    }
-
-    updateTargets()
-    rafRef.current = requestAnimationFrame(tick)
-
-    const handleScroll = () => {
-      updateTargets()
-    }
-
-    const handleResize = () => updateTargets()
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('resize', handleResize)
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', handleResize)
-      cancelAnimationFrame(rafRef.current)
-    }
-  }, [])
+    return () => ctx.revert()
+  }, [prefersReducedMotion])
 
   return (
     <div className="page">
       <section className="hero" ref={heroRef}>
         <div className="hero-bg" aria-hidden="true">
-          <span className="orb orb-one"></span>
-          <span className="orb orb-two"></span>
-          <span className="orb orb-three"></span>
+          <span className="orb orb-one" ref={orbOneRef}></span>
+          <span className="orb orb-two" ref={orbTwoRef}></span>
+          <span className="orb orb-three" ref={orbThreeRef}></span>
         </div>
 
         <div className="hero-content">
           <p className="eyebrow">Scroll-Driven Showcase</p>
           <h1 className="headline" aria-label={headlineText}>
-            {headlineText.split('').map((char, index) => (
-              <span
-                key={`${char}-${index}`}
-                className={`char${char === ' ' ? ' space' : ''}`}
-              >
-                {char === ' ' ? '\u00A0' : char}
-              </span>
-            ))}
+            {buildHeadlineSequence(headlineText).map((item) =>
+              item.spacer ? (
+                <span className="word-gap" aria-hidden="true" key={item.key} />
+              ) : (
+                <span className="char" key={item.key}>
+                  {item.char}
+                </span>
+              )
+            )}
           </h1>
 
           <div className="stats">

@@ -88,11 +88,10 @@ body {
 .headline {
   font-family: 'Bebas Neue', sans-serif;
   font-size: clamp(2.6rem, 5vw, 5rem);
-  letter-spacing: 0.26em;
   line-height: 1;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.15em;
+  gap: 0.5rem;
   color: #fdf6e3;
 }
 
@@ -100,33 +99,29 @@ body {
   display: inline-block;
 }
 
-.char.space {
-  width: 0.75em;
+.word-gap {
+  width: 2.2rem;
 }
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+  gap: 20px 36px;
 }
 
 .stat {
-  padding: 16px 18px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(6px);
+  padding: 8px 0;
 }
 
 .stat-value {
   display: block;
-  font-size: 1.6rem;
-  font-weight: 700;
+  font-size: 1.7rem;
+  font-weight: 600;
 }
 
 .stat-label {
   display: block;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: rgba(244, 245, 247, 0.75);
   margin-top: 4px;
 }
@@ -170,7 +165,7 @@ body {
   z-index: 2;
   display: grid;
   place-items: center;
-  min-height: 420px;
+  min-height: 480px;
 }
 
 .glow {
@@ -184,15 +179,15 @@ body {
 
 .car {
   position: relative;
-  width: min(420px, 80vw);
-  height: 200px;
+  width: min(520px, 85vw);
+  height: 240px;
   transform-origin: center;
 }
 
 .car-shell {
   position: absolute;
-  inset: 40px 30px 50px;
-  border-radius: 50px 50px 30px 30px;
+  inset: 50px 35px 60px;
+  border-radius: 60px 60px 34px 34px;
   background: linear-gradient(135deg, #f4f1e6, #d2b57c);
   box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5),
     0 30px 45px rgba(0, 0, 0, 0.4);
@@ -200,42 +195,42 @@ body {
 
 .car-cockpit {
   position: absolute;
-  width: 140px;
-  height: 60px;
+  width: 180px;
+  height: 74px;
   border-radius: 40px 40px 10px 10px;
   background: linear-gradient(135deg, rgba(24, 27, 36, 0.95), rgba(65, 85, 120, 0.8));
-  top: 25px;
-  left: 120px;
+  top: 24px;
+  left: 150px;
   box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.25);
 }
 
 .car-line {
   position: absolute;
   width: 70%;
-  height: 6px;
+  height: 7px;
   background: rgba(8, 10, 12, 0.6);
   left: 15%;
-  bottom: 70px;
+  bottom: 84px;
   border-radius: 999px;
 }
 
 .car-wheel {
   position: absolute;
-  width: 62px;
-  height: 62px;
+  width: 74px;
+  height: 74px;
   border-radius: 50%;
   background: radial-gradient(circle, #2b2f3a 30%, #0a0c10 70%);
-  bottom: 25px;
+  bottom: 28px;
   box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.2),
     0 8px 18px rgba(0, 0, 0, 0.45);
 }
 
 .wheel-front {
-  right: 70px;
+  right: 80px;
 }
 
 .wheel-back {
-  left: 70px;
+  left: 80px;
 }
 
 .story {
@@ -293,7 +288,11 @@ body {
   }
 
   .headline {
-    letter-spacing: 0.18em;
+    gap: 0.35rem;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
   }
 }
 
