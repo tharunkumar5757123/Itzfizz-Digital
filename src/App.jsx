@@ -39,6 +39,7 @@ function App() {
   const heroRef = useRef(null)
   const visualRef = useRef(null)
   const glowRef = useRef(null)
+  const deviceRef = useRef(null)
   const orbOneRef = useRef(null)
   const orbTwoRef = useRef(null)
   const orbThreeRef = useRef(null)
@@ -65,10 +66,10 @@ function App() {
       gsap.to('.stat', {
         opacity: 1,
         y: 0,
-        duration: 0.6,
+        duration: 0.7,
         ease: 'power3.out',
-        stagger: 0.12,
-        delay: 0.35,
+        stagger: 0.16,
+        delay: 0.45,
       })
     }, heroRef)
 
@@ -84,36 +85,54 @@ function App() {
     gsap.registerPlugin(ScrollTrigger)
 
     const ctx = gsap.context(() => {
-      gsap.set(visual, { x: -120, y: 40, rotate: -8, scale: 0.96 })
+      const content = heroRef.current?.querySelector('.hero-content')
+
+      gsap.set(visual, { x: -220, y: 60, rotate: -10, scale: 0.94 })
+      if (deviceRef.current)
+        gsap.set(deviceRef.current, { y: 30, rotate: -6, scale: 0.98 })
       if (glow) gsap.set(glow, { opacity: 0.2 })
       if (orbOneRef.current) gsap.set(orbOneRef.current, { y: 0 })
       if (orbTwoRef.current) gsap.set(orbTwoRef.current, { y: 0 })
       if (orbThreeRef.current) gsap.set(orbThreeRef.current, { y: 0 })
+      if (content) gsap.set(content, { y: 0 })
+
+      const triggerSettings = {
+        trigger: heroRef.current,
+        start: 'top top',
+        end: '+=900',
+        scrub: 1.6,
+      }
 
       gsap.to(visual, {
-        x: 360,
-        y: -150,
-        rotate: 22,
-        scale: 1.16,
+        x: 620,
+        y: -220,
+        rotate: 28,
+        scale: 1.24,
         ease: 'none',
         scrollTrigger: {
-          trigger: heroRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1.4,
+          ...triggerSettings,
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
         },
       })
 
       if (glow) {
         gsap.to(glow, {
           opacity: 0.9,
+          scale: 1.25,
           ease: 'none',
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: 'top top',
-            end: 'bottom top',
-            scrub: 1.4,
-          },
+          scrollTrigger: triggerSettings,
+        })
+      }
+
+      if (deviceRef.current) {
+        gsap.to(deviceRef.current, {
+          y: -80,
+          rotate: 6,
+          scale: 1.05,
+          ease: 'none',
+          scrollTrigger: triggerSettings,
         })
       }
 
@@ -121,12 +140,7 @@ function App() {
         gsap.to(orbOneRef.current, {
           y: 120,
           ease: 'none',
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: 'top top',
-            end: 'bottom top',
-            scrub: 1.6,
-          },
+          scrollTrigger: triggerSettings,
         })
       }
 
@@ -134,12 +148,7 @@ function App() {
         gsap.to(orbTwoRef.current, {
           y: -140,
           ease: 'none',
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: 'top top',
-            end: 'bottom top',
-            scrub: 1.6,
-          },
+          scrollTrigger: triggerSettings,
         })
       }
 
@@ -147,12 +156,26 @@ function App() {
         gsap.to(orbThreeRef.current, {
           y: 90,
           ease: 'none',
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: 'top top',
-            end: 'bottom top',
-            scrub: 1.6,
-          },
+          scrollTrigger: triggerSettings,
+        })
+      }
+
+      if (content) {
+        gsap.to(content, {
+          y: -60,
+          ease: 'none',
+          scrollTrigger: triggerSettings,
+        })
+      }
+
+      const road = heroRef.current?.querySelector('.road')
+      if (road) {
+        gsap.set(road, { scaleX: 0.6, opacity: 0.4 })
+        gsap.to(road, {
+          scaleX: 1.15,
+          opacity: 0.85,
+          ease: 'none',
+          scrollTrigger: triggerSettings,
         })
       }
     }, heroRef)
@@ -170,7 +193,6 @@ function App() {
         </div>
 
         <div className="hero-content">
-          <p className="eyebrow">Scroll-Driven Showcase</p>
           <h1 className="headline" aria-label={headlineText}>
             {buildHeadlineSequence(headlineText).map((item) =>
               item.spacer ? (
@@ -192,14 +214,15 @@ function App() {
             ))}
           </div>
 
-          <div className="cta-row">
-            <button className="primary">Start the ride</button>
-            <button className="ghost">View process</button>
-          </div>
         </div>
 
         <div className="hero-visual">
           <div className="glow" ref={glowRef} aria-hidden="true"></div>
+          <div className="device" ref={deviceRef} aria-hidden="true">
+            <div className="device-screen"></div>
+            <div className="device-bar"></div>
+          </div>
+          <div className="road" aria-hidden="true"></div>
           <div className="car" ref={visualRef} aria-hidden="true">
             <div className="car-shell"></div>
             <div className="car-cockpit"></div>
@@ -210,32 +233,7 @@ function App() {
         </div>
       </section>
 
-      <section className="story">
-        <div className="story-card">
-          <h2>Scroll-triggered momentum</h2>
-          <p>
-            As you move down the page, the hero object glides, rotates, and
-            scales based on scroll progress. The animation uses interpolation to
-            keep motion buttery-smooth and avoid abrupt jumps.
-          </p>
-        </div>
-        <div className="story-card">
-          <h2>Premium UI polish</h2>
-          <p>
-            Typography, spacing, and layered gradients deliver a premium first
-            impression. The intro animation uses GSAP for crisp, staggered
-            reveals without heavy layout work.
-          </p>
-        </div>
-      </section>
-
-      <section className="footer">
-        <h3>Keep scrolling for depth</h3>
-        <p>
-          This section exists to provide scroll length and demonstrate that the
-          hero animation is linked to user interaction, not time-based autoplay.
-        </p>
-      </section>
+      <section className="spacer" aria-hidden="true"></section>
     </div>
   )
 }
